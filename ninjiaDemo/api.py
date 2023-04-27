@@ -1,15 +1,25 @@
-from datetime import date
-from typing import List
 from ninja import NinjaAPI, Schema
-from django.shortcuts import get_object_or_404
-from ninjaapp.models import Employee
+import jwt
 
 api = NinjaAPI()
 
-weapons = ["Ninjato", "Shuriken", "Katana", "Kama", "Kunai", "Naginata", "Yari"]
+class LoginSchema(Schema):
+    name: str
+    password: str
 
-@api.get("/weapons")
-def list_weapons(request, limit: int = 10, offset: int = 0):
-    return weapons
+@api.post("/login")
+def login(request, data: LoginSchema):
+    result = {"code": 0, "data": {"id": 0, "name": "", "token": ""}}
+    name = data.name
+    password = data.password
+    b = {'name': name, 'password': password}
+    token = jwt.encode(b, 'secret', algorithm='HS256')
+    result["data"]["name"] = name
+    result["data"]["token"] = token
+    return result
 
-
+@api.get("/users/{user_id}")
+def userInfo(request, user_id: int):
+    result = {"code": 0, "data": {"id": 0, "name": ""}}
+    result["data"]["name"] = "陈俊亦"
+    return result
