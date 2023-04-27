@@ -1,17 +1,15 @@
-from ninja import NinjaAPI,Schema
+from datetime import date
+from typing import List
+from ninja import NinjaAPI, Schema
+from django.shortcuts import get_object_or_404
+from ninjaapp.models import Employee
 
 api = NinjaAPI()
-class HelloSchema(Schema):
-    name: str = 'ok'
 
-@api.post("/hello")
-def hello(request, data: HelloSchema):
-    return f"你好，{data.name}"
+weapons = ["Ninjato", "Shuriken", "Katana", "Kama", "Kunai", "Naginata", "Yari"]
 
-@api.get("/math/")
-def math(request, a: int, b: int):
-    return {"add": a + b, "multiply": a * b}
+@api.get("/weapons")
+def list_weapons(request, limit: int = 10, offset: int = 0):
+    return weapons
 
-@api.get("/math/{a}and{b}")
-def math(request, a: int, b: int):
-    return {"add": a + b, "multiply": a * b}
+
