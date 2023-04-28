@@ -6,6 +6,7 @@ class Department(models.Model):
 
 class Employee(models.Model):
     id = models.IntegerField(primary_key=True)
+    age = models.IntegerField(default=20)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)

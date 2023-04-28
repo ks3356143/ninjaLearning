@@ -1,25 +1,34 @@
-from ninja import NinjaAPI, Schema
-import jwt
+from django.db.models import Q
+from ninja import NinjaAPI, FilterSchema, Schema, Field, Query
+from typing import Optional,List
+import orjson
+from ninja.parser import Parser
+from datetime import date
 
-api = NinjaAPI()
+class OrjsonParser(Parser):
+    def parse_body(self, request):
+        return orjson.loads(request.body)
 
-class LoginSchema(Schema):
-    name: str
-    password: str
+api = NinjaAPI(parser=OrjsonParser())
 
-@api.post("/login")
-def login(request, data: LoginSchema):
-    result = {"code": 0, "data": {"id": 0, "name": "", "token": ""}}
-    name = data.name
-    password = data.password
-    b = {'name': name, 'password': password}
-    token = jwt.encode(b, 'secret', algorithm='HS256')
-    result["data"]["name"] = name
-    result["data"]["token"] = token
-    return result
+# 使用filter函数
+class EmployeeFilterSchema(FilterSchema):
+    def custom_expression(self) -> Q:
+        q = Q()
 
-@api.get("/users/{user_id}")
-def userInfo(request, user_id: int):
-    result = {"code": 0, "data": {"id": 0, "name": ""}}
-    result["data"]["name"] = "陈俊亦"
-    return result
+    first_name: Optional[str] = Field(q='first_name__icontains')
+    age: Optional[str]
+
+class EmployeeOut(Schema):
+    id:int
+    first_name:str
+    last_name:str
+    department_id: int = None
+    birthdate:date
+
+from ninjaapp.models import Employee
+
+@api.get("/employee",response=List[EmployeeOut])
+def list_employee(request, filters: EmployeeFilterSchema = Query(...)):
+    employees = Employee.objects.filter(filters.first_name)
+    return employees
