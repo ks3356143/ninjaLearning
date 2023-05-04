@@ -1,9 +1,9 @@
-from django.db.models import Q
-from ninja import NinjaAPI, FilterSchema, Schema, Field, Query
-from typing import Optional,List
+from ninja import NinjaAPI, Schema, Field
 import orjson
 from ninja.parser import Parser
-from datetime import date
+from django.contrib.auth.models import User
+from ninjaapp.models import Task
+from typing import List, Optional
 
 class OrjsonParser(Parser):
     def parse_body(self, request):
@@ -11,24 +11,28 @@ class OrjsonParser(Parser):
 
 api = NinjaAPI(parser=OrjsonParser())
 
-# 使用filter函数
-class EmployeeFilterSchema(FilterSchema):
-    def custom_expression(self) -> Q:
-        q = Q()
+class UserSchema(Schema):
+    id: int
+    first_name: str
+    last_name: str
 
-    first_name: Optional[str] = Field(q='first_name__icontains')
-    age: Optional[str]
+class TaskSchema(Schema):
+    id: int
+    title: str
+    completed: str = Field(..., alias="is_completed")
+    owner: Optional[str]
+    lower_title: str
+    @staticmethod
+    def resolve_owner(obj):
+        if not obj.owner:
+            return
+        return f"{obj.owner.first_name} {obj.owner.last_name}"
+    def resolve_lower_title(self,obj):
+        return self.title.lower()
 
-class EmployeeOut(Schema):
-    id:int
-    first_name:str
-    last_name:str
-    department_id: int = None
-    birthdate:date
+@api.get("/tasks", response=List[TaskSchema])
+def tasks(request):
+    queryset = Task.objects.select_related("owner")
+    return queryset
 
-from ninjaapp.models import Employee
 
-@api.get("/employee",response=List[EmployeeOut])
-def list_employee(request, filters: EmployeeFilterSchema = Query(...)):
-    employees = Employee.objects.filter(filters.first_name)
-    return employees

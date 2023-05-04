@@ -12,3 +12,9 @@ class Employee(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     birthdate = models.DateField(null=True, blank=True)
     cv = models.FileField(null=True, blank=True)
+
+class Task(models.Model):
+    id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=200)
+    is_completed = models.BooleanField(default=False)
+    owner = models.ForeignKey("auth.User", null=True, blank=True,on_delete=models.CASCADE)
