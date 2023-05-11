@@ -41,7 +41,7 @@ def user_lists(request, data:queryInfoSchema):
                     "name": "james",
                     "realname": "詹姆斯",
                     "cellphone": 13322223338,
-                    "enable": 1,
+                    "enable": 0,
                     "department": 1,
                     "roleId": 1,
                     "createAt": "2021-08-08T02:59:13.000Z",
