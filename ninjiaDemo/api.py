@@ -1,24 +1,36 @@
-from ninja import NinjaAPI, Field, Query, Schema, Path
-import orjson
 from ninja.parser import Parser
-from typing import List
-import datetime
+from ninja.renderers import BaseRenderer
+from ninja import NinjaAPI, Query, FilterSchema, Field, Schema, ModelSchema
+from typing import Optional, List, Any
+from datetime import date
+import orjson
+from ninjaapp.models import Employee
+from django.db.models import Q
 
 class OrjsonParser(Parser):
     def parse_body(self, request):
         return orjson.loads(request.body)
 
-api = NinjaAPI(parser=OrjsonParser())
+class OrjsonRenderer(BaseRenderer):
+    media_type = "application/json"
+    def render(self, request, data, *, response_status: int) -> Any:
+        return orjson.dumps(data)
 
-from datetime import date
+api = NinjaAPI(parser=OrjsonParser(),renderer=OrjsonRenderer())
 
+class EmployeeFilterSchema(FilterSchema):
+    id: Optional[int] = Field(q="id__contains")
+    age: Optional[int]
+    birthdate: Optional[date]
 
-class Filters(Schema):
-    limit: int = 100
-    offset: int = None
-    query: str = None
-    category__in: List[str] = Field(None, alias="categories")
+class EmployeeOut(ModelSchema):
+    class Config:
+        model = Employee
+        model_fields = ['id']
 
-@api.get("/filter")
-def events(request, filters: Filters = Query(...)):
-    return {"filters": filters.dict()}
+@api.get("/books", response=List[EmployeeOut])
+def list_books(request, filters: EmployeeFilterSchema = Query(...)):
+    q = filters.get_filter_expression()
+    employee = Employee.objects.filter(q)
+    print(employee)
+    return employee
