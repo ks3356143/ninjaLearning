@@ -12,7 +12,7 @@ projectList = [
         "duty_person": "尧颖婷", #####
         "member": ['陈俊亦', '尧颖婷', '李鑫', '王光宗'], #####
         "security_level": '2', #####
-        "test_level": ['1'], #####
+        "test_level": ['1','2'], #####
         "plant_type": '1', #####
         "report_type": '2', #####
         "language": ['7'], #####
