@@ -373,3 +373,18 @@ from ninjiaDemo.testDir.projectList import projectList
 def project_list(request, page, pageSize):
     result['data'] = projectList
     return result
+
+# ~~~~~~~~~~~~树状节点获取~~~~~~~~~~~~
+## 树第一层：round
+from ninjiaDemo.testDir.treeData import roundData,demandData
+@api.get("/project/getRoundInfo/{projectId}")
+def get_round(request,projectId):
+    print(projectId)
+    return roundData
+## 树第二层：设计需求
+@api.get("/project/getdemandInfo")
+def get_demand(request,projectId,key,level):
+    print('项目id:',projectId)
+    print('树key:', key)
+    print('树level:', level)
+    return demandData
