@@ -1,6 +1,6 @@
 projectList = [
     {
-        'id': 1, #####
+        'id': 0, #####
         "ident": "R2223", #####
         "name": 'EP-WXT触发处理主控软件', #####
         "engin_model": "EP卫星", #####
@@ -35,7 +35,7 @@ projectList = [
         'step': '3' #####
     },
     {
-        'id': 2,
+        'id': 1,
         "ident": "R2133",
         "name": 'EP-WXT触发处理主控软件',
         "engin_model": "EP卫星",
@@ -71,7 +71,7 @@ projectList = [
     },
     {
         "ident": "R2423",
-        'id': 3,
+        'id': 2,
         "name": 'EP-WXT触发处理主控软件',
         "engin_model": "EP卫星",
         "section_system": '控制模块',
@@ -106,7 +106,7 @@ projectList = [
     },
     {
         "ident": "F2214",
-        'id': 4,
+        'id': 3,
         "name": 'EP-WXT触发处理主控软件',
         "engin_model": "EP卫星",
         "section_system": '控制模块',
@@ -141,7 +141,7 @@ projectList = [
     },
     {
         "ident": "R2123",
-        "id": 5,
+        "id": 4,
         "name": 'EP-WXT触发处理主控软件',
         "engin_model": "EP卫星",
         "section_system": '控制模块',

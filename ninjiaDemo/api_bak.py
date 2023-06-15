@@ -364,6 +364,39 @@ def get_dict(request, code):
                           {'id': 7, 'title': 'BTCG-003', "key": '7'}, {'id': 8, 'title': 'BTCG-004', "key": '8'},
                           {'id': 9, 'title': 'BTCG-005', "key": '9'}, {'id': 10, 'title': 'BTCG-006', "key": '10'},
                           {'id': 11, 'title': 'BTCG-007', "key": '11'}, ]
+    if code == 'demandType':
+        result['data'] = [{"id": 1, 'title': "功能", "key": "1"}, {"id": 2, 'title': "性能", "key": "2"},
+                          {"id": 3, 'title': "接口", "key": "3"}, {"id": 4, 'title': "可靠性", "key": "4"},
+                          {"id": 5, 'title': "安全性", "key": "5"}, {"id": 6, 'title': "其他", "key": "6"}, ]
+    if code == 'priority':
+        result['data'] = [{"id": 1, 'title': "高", "key": "1"}, {"id": 2, 'title': "中", "key": "2"},
+                          {"id": 3, 'title': "低", "key": "3"}]
+    if code == 'testType':
+        result['data'] = [{"id": 1, 'title': "代码审查", "key": "1"}, {"id": 2, 'title': "代码走查", "key": "2"},
+                          {"id": 3, 'title': "功能测试", "key": "3"}, {"id": 4, 'title': "接口测试", "key": "4"},
+                          {"id": 5, 'title': "性能测试", "key": "5"}, {"id": 6, 'title': "安全性测试", "key": "6"},
+                          {"id": 7, 'title': "文档审查", "key": "7"}, {"id": 8, 'title': "边界测试", "key": "8"},
+                          {"id": 9, 'title': "余量测试", "key": "9"}, {"id": 10, 'title': "强度测试", "key": "10"},
+                          {"id": 11, 'title': "人机交互界面测试", "key": "11"}, {"id": 12, 'title': "逻辑测试", "key": "12"},
+                          {"id": 13, 'title': "恢复性测试", "key": "13"}, {"id": 14, 'title': "静态分析", "key": "14"},
+                          {"id": 15, 'title': "功耗分析", "key": "15"}, {"id": 16, 'title': "时序测试", "key": "16"}, ]
+    if code == 'passType':
+        result['data'] = [{"id": 1, 'title': "通过", "key": "1"}, {"id": 2, 'title': "未通过", "key": "2"},
+                          {"id": 3, 'title': "未执行", "key": "3"}, ]
+    if code == 'execType':
+        result['data'] = [{"id": 1, 'title': "完整执行", "key": "1"}, {"id": 2, 'title': "部分执行", "key": "2"},
+                          {"id": 3, 'title': "未执行", "key": "3"}, ]
+    if code == 'problemStatu':
+        result['data'] = [{"id": 1, 'title': "关闭", "key": "1"}, {"id": 2, 'title': "开放", "key": "2"},
+                          {"id": 3, 'title': "推迟", "key": "3"}, {"id": 4, 'title': "撤销", "key": "4"}, ]
+    if code == 'problemType':
+        result['data'] = [{"id": 1, 'title': "其他问题", "key": "1"}, {"id": 2, 'title': "文档问题", "key": "2"},
+                          {"id": 3, 'title': "程序问题", "key": "3"}, {"id": 4, 'title': "设计问题", "key": "4"}, ]
+    if code == 'problemGrade':
+        result['data'] = [{"id": 1, 'title': "一般", "key": "1"}, {"id": 2, 'title': "严重", "key": "2"},
+                          {"id": 3, 'title': "建议", "key": "3"}, {"id": 4, 'title': "致命", "key": "4"}, ]
+    if code == 'closeMethod':
+        result['data'] = [{"id": 1, 'title': "修改文档", "key": "1"}, {"id": 2, 'title': "修改程序", "key": "2"}, ]
     return result
 
 # ~~~~~~~~~~~项目管理页面~~~~~~~~~~~~
@@ -376,15 +409,83 @@ def project_list(request, page, pageSize):
 
 # ~~~~~~~~~~~~树状节点获取~~~~~~~~~~~~
 ## 树第一层：round
-from ninjiaDemo.testDir.treeData import roundData,demandData
+from ninjiaDemo.testDir.treeData import roundData, demandData, testdemandTreeData, caseTreeData, problemTreeData
+
 @api.get("/project/getRoundInfo/{projectId}")
-def get_round(request,projectId):
+def get_round(request, projectId):
     print(projectId)
     return roundData
+
 ## 树第二层：设计需求
-@api.get("/project/getdemandInfo")
-def get_demand(request,projectId,key,level):
-    print('项目id:',projectId)
+@api.get("/project/getDesignDemandInfo")
+def get_demand(request, projectId, key, level):
+    print('项目id:', projectId)
     print('树key:', key)
     print('树level:', level)
     return demandData
+
+from ninjiaDemo.testDir.designDemand import designDemandData
+
+@api.get("/project/getDesignDemandList")
+def getDesignDemandList(request, page, pageSize, projectId, round):
+    print('项目id为：', projectId)
+    print('轮次为：', round)
+    result['data'] = designDemandData
+    return result
+
+## 树第三层：测试需求
+@api.get("/project/getTestdemandInfo")
+def get_demand(request, projectId, key, level):
+    print('项目id:', projectId)
+    print('树key:', key)
+    print('树level:', level)
+    return testdemandTreeData
+
+from ninjiaDemo.testDir.testDemand import testDemandData
+
+@api.get("/project/getTestDemandList")
+def get_test_demand(request, page, pageSize, projectId, round, designDemand):
+    print('项目id为：', projectId)
+    print('轮次为：', round)
+    print('设计需求为：', designDemand)
+    result['data'] = testDemandData
+    return result
+
+## 树第四层：测试用例
+@api.get("/project/getCaseInfo")
+def get_demand(request, projectId, key, level):
+    print('项目id:', projectId)
+    print('树key:', key)
+    print('树level:', level)
+    return caseTreeData
+
+from ninjiaDemo.testDir.caseData import caseData
+
+@api.get("/project/getCaseList")
+def get_case(request, page, pageSize, projectId, round, designDemand, testDemand):
+    print('项目id为：', projectId)
+    print('轮次为：', round)
+    print('设计需求为：', designDemand)
+    print('测试需求为：', testDemand)
+    result['data'] = caseData
+    return result
+
+## 树第五层：问题单
+@api.get("/project/getProblemInfo")
+def get_demand(request, projectId, key, level):
+    print('项目id:', projectId)
+    print('树key:', key)
+    print('树level:', level)
+    return problemTreeData
+
+from ninjiaDemo.testDir.problemData import problemData
+
+@api.get("/project/getProblemList")
+def get_case(request, page, pageSize, projectId, round, designDemand, testDemand, case):
+    print('项目id为：', projectId)
+    print('轮次为：', round)
+    print('设计需求为：', designDemand)
+    print('测试需求为：', testDemand)
+    print('用例为：', testDemand)
+    result['data'] = problemData
+    return result
