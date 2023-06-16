@@ -486,6 +486,18 @@ def get_case(request, page, pageSize, projectId, round, designDemand, testDemand
     print('轮次为：', round)
     print('设计需求为：', designDemand)
     print('测试需求为：', testDemand)
-    print('用例为：', testDemand)
+    print('用例为：', case)
     result['data'] = problemData
+    return result
+
+## 树第六层：问题单单个展示样子
+@api.get('/project/getSingleProblem')
+def get_single_problem(request, projectId, round, designDemand, testDemand, case, problem):
+    print('项目id为：', projectId)
+    print('轮次为：', round)
+    print('设计需求为：', designDemand)
+    print('测试需求为：', testDemand)
+    print('用例为：', case)
+    print('问题单编号为：', problem)
+    result['data'] = problemData[2]
     return result
