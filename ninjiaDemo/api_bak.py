@@ -409,12 +409,30 @@ def project_list(request, page, pageSize):
 
 # ~~~~~~~~~~~~树状节点获取~~~~~~~~~~~~
 ## 树第一层：round
-from ninjiaDemo.testDir.treeData import roundData, demandData, testdemandTreeData, caseTreeData, problemTreeData
+from ninjiaDemo.testDir.treeData import roundData, dutData, demandData, testdemandTreeData, caseTreeData, \
+    problemTreeData
 
 @api.get("/project/getRoundInfo/{projectId}")
 def get_round(request, projectId):
     print(projectId)
     return roundData
+
+## 树第1.5层：dut
+@api.get("/project/getDutInfo")
+def get_dut(request, projectId, key, level):
+    print('项目id:', projectId)
+    print('树key:', key)
+    print('树level:', level)
+    return dutData
+
+from ninjiaDemo.testDir.dutData import dutDataList
+
+@api.get("/project/getDutList")
+def getDesignDemandList(request, page, pageSize, projectId, round):
+    print('项目id为：', projectId)
+    print('轮次为：', round)
+    result['data'] = dutDataList
+    return result
 
 ## 树第二层：设计需求
 @api.get("/project/getDesignDemandInfo")
@@ -427,9 +445,10 @@ def get_demand(request, projectId, key, level):
 from ninjiaDemo.testDir.designDemand import designDemandData
 
 @api.get("/project/getDesignDemandList")
-def getDesignDemandList(request, page, pageSize, projectId, round):
+def getDesignDemandList(request, page, pageSize, projectId, round, dut):
     print('项目id为：', projectId)
     print('轮次为：', round)
+    print('被测件：', dut)
     result['data'] = designDemandData
     return result
 
@@ -444,9 +463,10 @@ def get_demand(request, projectId, key, level):
 from ninjiaDemo.testDir.testDemand import testDemandData
 
 @api.get("/project/getTestDemandList")
-def get_test_demand(request, page, pageSize, projectId, round, designDemand):
+def get_test_demand(request, page, pageSize, projectId, round, dut, designDemand):
     print('项目id为：', projectId)
     print('轮次为：', round)
+    print('被测件：', dut)
     print('设计需求为：', designDemand)
     result['data'] = testDemandData
     return result
@@ -462,9 +482,10 @@ def get_demand(request, projectId, key, level):
 from ninjiaDemo.testDir.caseData import caseData
 
 @api.get("/project/getCaseList")
-def get_case(request, page, pageSize, projectId, round, designDemand, testDemand):
+def get_case(request, page, pageSize, projectId, round, dut, designDemand, testDemand):
     print('项目id为：', projectId)
     print('轮次为：', round)
+    print('被测件：', dut)
     print('设计需求为：', designDemand)
     print('测试需求为：', testDemand)
     result['data'] = caseData
@@ -481,9 +502,10 @@ def get_demand(request, projectId, key, level):
 from ninjiaDemo.testDir.problemData import problemData
 
 @api.get("/project/getProblemList")
-def get_case(request, page, pageSize, projectId, round, designDemand, testDemand, case):
+def get_case(request, page, pageSize, projectId, round, dut, designDemand, testDemand, case):
     print('项目id为：', projectId)
     print('轮次为：', round)
+    print('被测件：', dut)
     print('设计需求为：', designDemand)
     print('测试需求为：', testDemand)
     print('用例为：', case)
