@@ -417,6 +417,14 @@ def get_round(request, projectId):
     print(projectId)
     return roundData
 
+from ninjiaDemo.testDir.roundData import roundDataInfo
+@api.get("/project/getOneRoundInfo")
+def get_roundInfo(request,projectId,round):
+    print('项目id:', projectId)
+    print('轮次信息:', round)
+    result['data'] = roundDataInfo
+    return result
+
 ## 树第1.5层：dut
 @api.get("/project/getDutInfo")
 def get_dut(request, projectId, key, level):

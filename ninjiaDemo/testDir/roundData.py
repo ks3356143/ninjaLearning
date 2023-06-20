@@ -1,0 +1,15 @@
+roundDataInfo = {
+    'ident': "R1",
+    'name': "第一轮测试",
+    'beginTime': "2023-08-06",
+    'endTime': '2024-06-08',
+    'speedGrade': "一级",
+    'package': "00111",
+    'grade': '3',
+    'best_condition_voltage': '5V',
+    'best_condition_tem': '25',
+    'typical_condition_voltage': '4.7V',
+    'typical_condition_tem': '25',
+    'low_condition_voltage': '1.7V',
+    'low_condition_tem': '-25',
+}
