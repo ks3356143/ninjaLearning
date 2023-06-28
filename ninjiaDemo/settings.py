@@ -1,4 +1,7 @@
+import os
+from datetime import timedelta
 from pathlib import Path
+from conf.env import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,9 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-1e=-@5kcu))b6g7(*u+5dykk3pr0dkznrt+!))%7vf*tu#pxfn'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DEBUG = locals().get('DEBUG', True)
+ALLOWED_HOSTS = locals().get('ALLOWED_HOSTS', ['*'])
+DEMO = locals().get('DEMO', False)
 
 # Application definition
 
@@ -24,8 +27,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ninjaapp',
-    'ninja',
+    'django_celery_beat',
+    'django_celery_results',
+    'ninjaapp', # 创建的app一号
+    'ninja', # 添加到这里便于在前端接口页面加载快一点
 ]
 
 MIDDLEWARE = [
@@ -38,8 +43,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# 设置主路由
 ROOT_URLCONF = 'ninjiaDemo.urls'
 
+# 接口模式不变
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -57,21 +64,55 @@ TEMPLATES = [
     },
 ]
 
+# 也不用设置
 WSGI_APPLICATION = 'ninjiaDemo.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# 数据库配置
+if DATABASE_TYPE == "MYSQL":
+    # Mysql数据库
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "HOST": DATABASE_HOST,
+            "PORT": DATABASE_PORT,
+            "USER": DATABASE_USER,
+            "PASSWORD": DATABASE_PASSWORD,
+            "NAME": DATABASE_NAME,
+        }
     }
-}
+elif DATABASE_TYPE == "SQLSERVER":
+    # SqlServer数据库
+    DATABASES = {
+        "default": {
+            "ENGINE": "mssql",
+            "HOST": DATABASE_HOST,
+            "PORT": DATABASE_PORT,
+            "USER": DATABASE_USER,
+            "PASSWORD": DATABASE_PASSWORD,
+            "NAME": DATABASE_NAME,
+            # 全局开启事务，绑定的是http请求响应整个过程
+            'ATOMIC_REQUESTS': True,
+            'OPTIONS': {
+                'driver': 'ODBC Driver 17 for SQL Server',
+            },
+        }
+    }
+else:
+    # sqlite3 数据库
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'OPTIONS': {
+                'timeout': 20,
+            },
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -96,6 +137,8 @@ TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
+USE_L10N = True
+
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
@@ -107,3 +150,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+AUTH_USER_MODEL = 'ninjaapp.Users'
+USERNAME_FIELD = 'username'
+ALL_MODELS_OBJECTS = []  # 所有app models 对象
+
+
+# token 有效时间 时 分 秒
+TOKEN_LIFETIME = 12 * 60 * 60
+# TOKEN_LIFETIME = 50

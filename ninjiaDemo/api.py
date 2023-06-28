@@ -1,36 +1,18 @@
-from ninja.parser import Parser
-from ninja.renderers import BaseRenderer
-from ninja import NinjaAPI, Query, FilterSchema, Field, Schema, ModelSchema
-from typing import Optional, List, Any
-from datetime import date
-import orjson
-from ninjaapp.models import Employee
-from django.db.models import Q
+# -*- coding: utf-8 -*-
+## 将其他模块导入
+from ninjaapp.router import system_router, testmanage_router, project_router
+from utils.chen_ninja import ChenNinjaAPI
 
-class OrjsonParser(Parser):
-    def parse_body(self, request):
-        return orjson.loads(request.body)
+api = ChenNinjaAPI()
 
-class OrjsonRenderer(BaseRenderer):
-    media_type = "application/json"
-    def render(self, request, data, *, response_status: int) -> Any:
-        return orjson.dumps(data)
+# 统一处理server异常
+@api.exception_handler(Exception)
+def a(request, exc):
+    if hasattr(exc, 'errno'):
+        return api.create_response(request, data=[], message=str(exc), code=exc.errno)
+    else:
+        return api.create_response(request, data=[], message=str(exc), code=500)
 
-api = NinjaAPI(parser=OrjsonParser(),renderer=OrjsonRenderer())
-
-class EmployeeFilterSchema(FilterSchema):
-    id: Optional[int] = Field(q="id__contains")
-    age: Optional[int]
-    birthdate: Optional[date]
-
-class EmployeeOut(ModelSchema):
-    class Config:
-        model = Employee
-        model_fields = ['id']
-
-@api.get("/books", response=List[EmployeeOut])
-def list_books(request, filters: EmployeeFilterSchema = Query(...)):
-    q = filters.get_filter_expression()
-    employee = Employee.objects.filter(q)
-    print(employee)
-    return employee
+api.add_router('/system/', system_router)
+api.add_router("/testmanage/", testmanage_router)
+api.add_router("/project/", project_router)

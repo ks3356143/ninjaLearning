@@ -2,6 +2,7 @@ from ninja import NinjaAPI, Schema, Form
 from typing import List
 from datetime import date
 import jwt
+from django.forms.models import model_to_dict
 
 api = NinjaAPI()
 
@@ -20,6 +21,9 @@ def login(request, data: LoginSchema):
     password = data.password
     b = {'name': name, 'password': password}
     token = jwt.encode(b, 'secret', algorithm='HS256')
+    result = {"success": True, "message": "请求成功", "code": 200, "data": {
+        "token": ""
+    }}
     result["data"]["token"] = token
     return result
 
@@ -27,29 +31,31 @@ def login(request, data: LoginSchema):
 def logout(request):
     return result
 
+from ninjaapp.models import Users
+
+class UserInfoSchema(Schema):  # 定义data中的userInfo信息
+    class Config:
+        model = Users
+        model_fields = ['username', 'name', "avatar", "email", "job", "jobName", "organization", "organizationName",
+                        "location",
+                        "locationName", "introduction", "personalWebsite", "phone", "registrationDate", "accountId",
+                        "certification", "role"]
+        model_exclude = ['password']
+
 @api.get("/system/getInfo")
-def info(request):
-    role = 'admin'
-    result["data"] = {
-        "username": "superAdmin",
-        "name": '陈小球',
-        "avatar": '//lf1-xgcdn-tos.pstatp.com/obj/vcloud/vadmin/start.8e0e4855ee346a46ccff8ff3e24db27b.png',
-        "email": 'wangliqun@email.com',
-        "job": 'frontend',
-        "jobName": '前端艺术家',
-        "organization": 'Frontend',
-        "organizationName": '前端',
-        "location": 'chengdu',
-        "locationName": '成都',
-        "introduction": '这是我的自我介绍',
-        "personalWebsite": 'https://www.arco.design',
-        "phone": '18782947123',
-        "registrationDate": '2013-05-10 12:10:00',
-        "accountId": '15012312300',
-        "certification": 1,
-        "role": role
+def get_userinfo(request):
+    # token = request.META.get("HTTP_AUTHORIZATION")
+    # token = token.split(" ")[1]  # 获取token
+    user = Users.objects.get(id=1)
+    user_obj_dic = model_to_dict(user)
+    user_obj_dic.pop("password")
+    response_data = {
+        "success": True,
+        "message": '请求成功',
+        'code': 200,
+        'data': user_obj_dic
     }
-    return result
+    return response_data
 
 # 获取公共信息接口
 class itemSchema(Schema):
@@ -418,8 +424,9 @@ def get_round(request, projectId):
     return roundData
 
 from ninjiaDemo.testDir.roundData import roundDataInfo
+
 @api.get("/project/getOneRoundInfo")
-def get_roundInfo(request,projectId,round):
+def get_roundInfo(request, projectId, round):
     print('项目id:', projectId)
     print('轮次信息:', round)
     result['data'] = roundDataInfo
@@ -459,6 +466,17 @@ def getDesignDemandList(request, page, pageSize, projectId, round, dut):
     print('被测件：', dut)
     result['data'] = designDemandData
     return result
+
+class designDemandEdit(Schema):
+    id: int
+    description: str
+    ident: str
+    name: str
+    demandType: str
+
+@api.put("/project/editDesignDemand/{id}")
+def editDesignDemand(request, id, data: designDemandEdit):
+    print(data.description)
 
 ## 树第三层：测试需求
 @api.get("/project/getTestdemandInfo")
